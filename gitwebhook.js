@@ -1,22 +1,45 @@
 const express = require('express');
-const app = express();
 const bodyParser = require('body-parser');
+const createHandler = require('github-webhook-handler');
+const { exec } = require('child_process');
+
+const app = express();
 const port = 9999;
+const secret = '73025532'; // GitHub 웹훅 시크릿 설정
 
 // JSON 파싱 미들웨어 설정
 app.use(bodyParser.json());
 
+// GitHub 웹훅 핸들러 생성
+const handler = createHandler({ path: '/github-webhook', secret: secret });
+
 // POST 요청 처리
 app.post('/github-webhook', (req, res) => {
-  const eventData = req.body;
+  handler(req, res, (err) => {
+    if (err) {
+      console.error('Error handling webhook:', err.message);
+      return res.status(500).send('Webhook Error');
+    }
+    res.status(200).send('Webhook Received');
+  });
+});
 
-  // 웹훅 이벤트를 처리하고 원하는 작업을 수행하세요.
-  // 이벤트 데이터는 eventData 변수에 있습니다.
+// main 브랜치 업데이트 이벤트 리스너
+handler.on('push', (event) => {
+  const payload = event.payload;
 
-  console.log('GitHub 웹훅 이벤트 수신:', eventData);
+  if (payload.ref === 'refs/heads/main') {
+    console.log('main 브랜치에 변경사항이 있습니다. 업데이트를 수행합니다.');
 
-  // 응답 보내기 (필요에 따라 처리 후 응답할 수 있음)
-  res.status(200).send('웹훅 이벤트 수신 완료');
+    // main 브랜치 업데이트를 처리하는 코드 추가
+    exec('git pull origin main', (error, stdout, stderr) => {
+      if (error) {
+        console.error('업데이트 중 에러 발생:', error);
+        return;
+      }
+      console.log('업데이트 완료:', stdout);
+    });
+  }
 });
 
 // 서버 시작

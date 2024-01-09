@@ -5,7 +5,20 @@ const { exec } = require('child_process');
 
 const app = express();
 const port = 9999;
-const secret = 'your-webhook-secret'; // GitHub 웹훅 시크릿 설정
+const secret = '73025532'; // GitHub 웹훅 시크릿 설정
+
+// 웹훅 요청의 본문과 X-Hub-Signature 헤더 가져오기
+const body = req.body;
+const signature = req.headers['x-hub-signature'];
+
+
+// 본문을 HMAC-SHA1으로 서명
+const expectedSignature = `sha1=${crypto.createHmac('sha1', secret).update(JSON.stringify(body)).digest('hex')}`;
+
+// 서명 검증
+if (signature !== expectedSignature) {
+  return res.status(400).send('X-Hub-Signature does not match blob signature');
+}
 
 // JSON 파싱 미들웨어 설정
 app.use(bodyParser.json());

@@ -1,6 +1,6 @@
 const express = require('express');
 const { google } = require('googleapis');
-const connectDB = require('./mongoClient');
+// const connectDB = require('./mongoClient');
 
 const app = express();
 const youtube = google.youtube({

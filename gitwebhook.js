@@ -5,7 +5,7 @@ const { exec } = require('child_process');
 
 const app = express();
 const port = 9999;
-const secret = '73025532'; // GitHub 웹훅 시크릿 설정
+const secret = 'your-webhook-secret'; // GitHub 웹훅 시크릿 설정
 
 // JSON 파싱 미들웨어 설정
 app.use(bodyParser.json());

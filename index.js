@@ -3,7 +3,7 @@ const { google } = require('googleapis');
 const bodyParser = require('body-parser');
 const mysql = require('mysql');
 
-const dbConfig  = require('./dbConfig.json');
+const dbConfig  = require('./dbconfig.json');
 const connection = mysql.createConnection(dbConfig);
 
 const app = express();

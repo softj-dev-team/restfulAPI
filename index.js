@@ -1,6 +1,10 @@
 const express = require('express');
 const { google } = require('googleapis');
-// const connectDB = require('./mongoClient');
+const bodyParser = require('body-parser');
+const mysql = require('mysql');
+
+const dbConfig  = require('./dbConfig.json');
+const connection = mysql.createConnection(dbConfig);
 
 const app = express();
 const youtube = google.youtube({
@@ -22,9 +26,46 @@ app.get('/youtube/search', async (req, res) => {
   }
 });
 app.use(express.json());
-app.get('/api/videotitle', (req, res) => {
-  res.status(200).json({title:'검색어test'})
+
+// 타이틀 저장 API
+app.post('/api/save-title', (req, res) => {
+    const user_id = req.body.user_id;
+    const title = req.body.title;
+
+    // 데이터베이스에 타이틀 저장
+    const query = 'INSERT INTO video (user_id, title) VALUES (?, ?)';
+    connection.query(query, [user_id, title], (error, results) => {
+        if (error) {
+            console.error('Error saving title:', error);
+            res.status(500).json({ error: 'Error saving title' });
+        } else {
+            console.log('Title saved successfully');
+            res.status(200).json({ message: 'Title saved successfully' });
+        }
+    });
 });
+// 타이틀 검색 API
+app.get('/api/search-title/:id', (req, res) => {
+    const id = req.params.id;
+
+    // 데이터베이스에서 id에 해당하는 title 검색
+    const query = 'SELECT title FROM video WHERE id = ?';
+    connection.query(query, [id], (error, results) => {
+        if (error) {
+            console.error('Error searching title:', error);
+            res.status(500).json({ error: 'Error searching title' });
+        } else {
+            if (results.length > 0) {
+                const title = results[0].title;
+                console.log('Title search successful');
+                res.status(200).json({ title });
+            } else {
+                res.status(404).json({ error: 'Title not found' });
+            }
+        }
+    });
+});
+
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

@@ -2,15 +2,22 @@ const express = require('express');
 const { google } = require('googleapis');
 const bodyParser = require('body-parser');
 const mysql = require('mysql');
-
-const dbConfig  = require('./dbconfig.json');
-const connection = mysql.createConnection(dbConfig);
+const dotenv = require('dotenv'); // dotenv 라이브러리 추가
 
 const app = express();
 const youtube = google.youtube({
   version: 'v3',
-  auth: 'AIzaSyAMoow-JnzjEWorJUa6653jTBxbvjygBrw'  // 여기에 획득한 API 키를 입력합니다.
+  auth: process.env.YOUTUBE_API_KEY // 여기에 획득한 API 키를 입력합니다.
 });
+dotenv.config(); // 환경 변수 로드
+
+const dbConfig = {
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE
+};
+const connection = mysql.createConnection(dbConfig);
 
 app.get('/youtube/search', async (req, res) => {
   try {

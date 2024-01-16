@@ -5,11 +5,13 @@ const mysql = require('mysql');
 const dotenv = require('dotenv'); // dotenv 라이브러리 추가
 
 const app = express();
+app.use(express.json());
+dotenv.config(); // 환경 변수 로드
+
 const youtube = google.youtube({
   version: 'v3',
   auth: process.env.YOUTUBE_API_KEY // 여기에 획득한 API 키를 입력합니다.
 });
-dotenv.config(); // 환경 변수 로드
 
 const dbConfig = {
   host: process.env.DB_HOST,
@@ -32,8 +34,6 @@ app.get('/youtube/search', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-app.use(express.json());
-
 // 타이틀 저장 API
 // 타이틀 저장 또는 업데이트 API
 app.post('/api/save-title', (req, res) => {
@@ -93,7 +93,20 @@ app.get('/api/search-title/:id', (req, res) => {
         }
     });
 });
-
+// 모든 레코드 리스트 가져오는 API
+app.get('/api/get-all-records', (req, res) => {
+  // 데이터베이스에서 모든 레코드 가져오기
+  const query = 'SELECT id, title, reg_date FROM video';
+  connection.query(query, (error, results) => {
+    if (error) {
+      console.error('Error fetching records:', error);
+      res.status(500).json({ error: 'Error fetching records' });
+    } else {
+      console.log('Records fetched successfully');
+      res.status(200).json(results);
+    }
+  });
+});
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

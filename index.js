@@ -3,10 +3,22 @@ const { google } = require('googleapis');
 const bodyParser = require('body-parser');
 const mysql = require('mysql');
 const dotenv = require('dotenv'); // dotenv 라이브러리 추가
+const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
+const bcrypt = require('bcrypt');
 
 const app = express();
 app.use(express.json());
 dotenv.config(); // 환경 변수 로드
+const nodemailer = require('nodemailer');
+// 이메일 전송 설정
+const transporter = nodemailer.createTransport({
+  service: 'Gmail', // Gmail을 사용하는 경우
+  auth: {
+    user: gmailUser, // Gmail 이메일
+    pass: gmailPass, // Gmail 비밀번호
+  },
+});
 
 const youtube = google.youtube({
   version: 'v3',
@@ -107,6 +119,49 @@ app.get('/api/get-all-records', (req, res) => {
     }
   });
 });
+// POST 요청 핸들러
+app.post('/api/send-verification-email', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // 랜덤한 코드 생성
+    const authCode = Math.random().toString(36).substring(2, 14);
+
+    // 코드 해싱
+    const hashedAuthCode = await bcrypt.hash(authCode, 10);
+
+    // 데이터베이스에 저장
+    const insertQuery = 'INSERT INTO user (email) VALUES (?)';
+    const [insertResult] = await db.promise().query(insertQuery, [email]);
+
+    const userTableId = insertResult.insertId;
+
+    const authInsertQuery = 'INSERT INTO user_auth (email, auth_code, user_table_id) VALUES (?, ?, ?)';
+    await db.promise().query(authInsertQuery, [email, hashedAuthCode, userTableId]);
+
+    // 이메일 전송
+    const mailOptions = {
+      from: gmailUser,
+      to: email,
+      subject: '인증 코드',
+      text: `인증 코드: ${authCode}`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Email sending error:', error);
+        res.status(500).json({ error: 'Error sending email' });
+      } else {
+        console.log('Email sent:', info.response);
+        res.status(200).json({ message: 'Email sent successfully' });
+      }
+    });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 app.get('/', (req, res) => {
   res.send('Hello, HTTPS World!');
 });

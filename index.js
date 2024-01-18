@@ -12,11 +12,14 @@ dotenv.config(); // 환경 변수 로드
 
 // 이메일 전송 설정
 const transporter = nodemailer.createTransport({
-  service: 'Gmail', // Gmail을 사용하는 경우
-  auth: {
-    user:  process.env.GMAIL_USER, // Gmail 이메일
-    pass:  process.env.GMAIL_PASS, // Gmail 비밀번호
-  },
+    service: 'Gmail', // Gmail을 사용하는 경우
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    auth: {
+        user:  process.env.GMAIL_USER, // Gmail 이메일
+        pass:  process.env.GMAIL_PASS, // Gmail 비밀번호
+    },
 });
 
 const youtube = google.youtube({

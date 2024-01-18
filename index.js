@@ -148,7 +148,7 @@ app.post('/api/send-verification-email', async (req, res) => {
               console.log('Email sent:', emailInfo.response);
 
               // 이메일 전송이 성공하면 user 테이블에 이메일 저장
-              const insertQuery = 'INSERT INTO user (email,user_id,password) VALUES (?)';
+              const insertQuery = 'INSERT INTO user (email,user_id,password) VALUES (?,?,?)';
               connection.query(insertQuery, [email, email, hashedAuthCode], (insertError, insertResults) => {
                   if (insertError) {
                       console.error('Error saving email:', insertError);

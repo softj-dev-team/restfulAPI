@@ -131,13 +131,29 @@ app.post('/api/send-verification-email', async (req, res) => {
 
     // 데이터베이스에 저장
     const insertQuery = 'INSERT INTO user (email) VALUES (?)';
-    const [insertResult] = await db.promise().query(insertQuery, [email]);
 
+    connection.query(insertQuery, [email], (insertError, insertResults) => {
+        if (insertError) {
+            console.error('Error saving title:', insertError);
+            res.status(500).json({ error: 'Error saving title' });
+        } else {
+            console.log('Title saved successfully');
+            res.status(200).json({ message: 'Title saved successfully' });
+        }
+    });
     const userTableId = insertResult.insertId;
 
     const authInsertQuery = 'INSERT INTO user_auth (email, auth_code, user_table_id) VALUES (?, ?, ?)';
-    await db.promise().query(authInsertQuery, [email, hashedAuthCode, userTableId]);
 
+    connection.query(authInsertQuery, [email, hashedAuthCode, userTableId], (insertError, insertResults) => {
+        if (insertError) {
+            console.error('Error saving title:', insertError);
+            res.status(500).json({ error: 'Error saving title' });
+        } else {
+            console.log('Title saved successfully');
+            res.status(200).json({ message: 'Title saved successfully' });
+        }
+    });
     // 이메일 전송
     const mailOptions = {
       from:  process.env.gmailUser,

@@ -14,8 +14,8 @@ dotenv.config(); // 환경 변수 로드
 const transporter = nodemailer.createTransport({
   service: 'Gmail', // Gmail을 사용하는 경우
   auth: {
-    user:  process.env.gmailUser, // Gmail 이메일
-    pass:  process.env.gmailPass, // Gmail 비밀번호
+    user:  process.env.GMAIL_USER, // Gmail 이메일
+    pass:  process.env.GMAIL_PASS, // Gmail 비밀번호
   },
 });
 
@@ -131,42 +131,43 @@ app.post('/api/send-verification-email', async (req, res) => {
 
     // 이메일 전송
     const mailOptions = {
-      from:  process.env.gmailUser,
+      from:  process.env.GMAIL_USER,
       to: email,
       subject: '인증 코드',
       text: `인증 코드: ${authCode}`,
     };
 
-   transporter.sendMail(mailOptions, (emailError, emailInfo) => {
-    if (emailError) {
-      console.error('Error sending email:', emailError);
-      res.status(500).json({ error: 'Error sending email' });
-    } else {
-      console.log('Email sent:', emailInfo.response);
+      transporter.sendMail(mailOptions, (emailError, emailInfo) => {
+          if (emailError) {
+              console.error('Error sending email:', emailError);
+              res.status(500).json({error: 'Error sending email'});
+          } else {
+              console.log('Email sent:', emailInfo.response);
 
-      // 이메일 전송이 성공하면 user 테이블에 이메일 저장
-      const insertQuery = 'INSERT INTO user (email,user_id,password) VALUES (?)';
-      connection.query(insertQuery, [email,email,hashedAuthCode], (insertError, insertResults) => {
-        if (insertError) {
-          console.error('Error saving email:', insertError);
-          res.status(500).json({ error: 'Error saving email' });
-        } else {
-          // user_auth 테이블에도 저장
-          const userId = insertResults.insertId;
-          const insertAuthQuery = 'INSERT INTO user_auth (user_table_id, email, auth_code) VALUES (?, ?, ?)';
-          connection.query(insertAuthQuery, [userId, email, authCode], (authInsertError, authInsertResults) => {
-            if (authInsertError) {
-              console.error('Error saving auth code:', authInsertError);
-              res.status(500).json({ error: 'Error saving auth code' });
-            } else {
-              console.log('Email and auth code saved successfully');
-              res.status(200).json({ message: 'Email and auth code saved successfully' });
-            }
-          });
-        }
+              // 이메일 전송이 성공하면 user 테이블에 이메일 저장
+              const insertQuery = 'INSERT INTO user (email,user_id,password) VALUES (?)';
+              connection.query(insertQuery, [email, email, hashedAuthCode], (insertError, insertResults) => {
+                  if (insertError) {
+                      console.error('Error saving email:', insertError);
+                      res.status(500).json({error: 'Error saving email'});
+                  } else {
+                      // user_auth 테이블에도 저장
+                      const userId = insertResults.insertId;
+                      const insertAuthQuery = 'INSERT INTO user_auth (user_table_id, email, auth_code) VALUES (?, ?, ?)';
+                      connection.query(insertAuthQuery, [userId, email, authCode], (authInsertError, authInsertResults) => {
+                          if (authInsertError) {
+                              console.error('Error saving auth code:', authInsertError);
+                              res.status(500).json({error: 'Error saving auth code'});
+                          } else {
+                              console.log('Email and auth code saved successfully');
+                              res.status(200).json({message: 'Email and auth code saved successfully'});
+                          }
+                      });
+                  }
+              });
+          }
       });
-    }
-  });
+
   } catch (error) {
     console.error('Error:', error);
     res.status(500).json({ error: 'Internal Server Error' });

@@ -139,37 +139,56 @@ app.post('/api/send-verification-email', async (req, res) => {
       subject: '인증 코드',
       text: `인증 코드: ${authCode}`,
     };
+    // 이메일 중복 확인 쿼리
+    const checkDuplicateEmailQuery = 'SELECT COUNT(*) as count FROM user WHERE email = ?';
+    // 먼저 중복된 이메일 주소가 있는지 확인
+    connection.query(checkDuplicateEmailQuery, [email], (checkError, checkResults) => {
+        if (checkError) {
+            console.error('Error checking duplicate email:', checkError);
+            res.status(500).json({ error: 'Error checking duplicate email' });
+        } else {
+            // 중복된 이메일이 없으면 새로운 사용자 등록 진행
+            if (checkResults[0].count === 0) {
 
-      transporter.sendMail(mailOptions, (emailError, emailInfo) => {
-          if (emailError) {
-              console.error('Error sending email:', emailError);
-              res.status(500).json({error: 'Error sending email'});
-          } else {
-              console.log('Email sent:', emailInfo.response);
+                // 나머지 코드 및 이메일 전송 코드 추가
+                transporter.sendMail(mailOptions, (emailError, emailInfo) => {
+                    if (emailError) {
+                        console.error('Error sending email:', emailError);
+                        res.status(500).json({error: 'Error sending email'});
+                    } else {
+                        console.log('Email sent:', emailInfo.response);
 
-              // 이메일 전송이 성공하면 user 테이블에 이메일 저장
-              const insertQuery = 'INSERT INTO user (email,user_id,password) VALUES (?,?,?)';
-              connection.query(insertQuery, [email, email, hashedAuthCode], (insertError, insertResults) => {
-                  if (insertError) {
-                      console.error('Error saving email:', insertError);
-                      res.status(500).json({error: 'Error saving email'});
-                  } else {
-                      // user_auth 테이블에도 저장
-                      const userId = insertResults.insertId;
-                      const insertAuthQuery = 'INSERT INTO user_auth (user_table_id, email, auth_code) VALUES (?, ?, ?)';
-                      connection.query(insertAuthQuery, [userId, email, authCode], (authInsertError, authInsertResults) => {
-                          if (authInsertError) {
-                              console.error('Error saving auth code:', authInsertError);
-                              res.status(500).json({error: 'Error saving auth code'});
-                          } else {
-                              console.log('Email and auth code saved successfully');
-                              res.status(200).json({message: 'Email and auth code saved successfully'});
-                          }
-                      });
-                  }
-              });
-          }
-      });
+                        // 이메일 전송이 성공하면 user 테이블에 이메일 저장
+                        const insertQuery = 'INSERT INTO user (email,user_id,password) VALUES (?,?,?)';
+                        connection.query(insertQuery, [email, email, hashedAuthCode], (insertError, insertResults) => {
+                            if (insertError) {
+                                console.error('Error saving email:', insertError);
+                                res.status(500).json({error: 'Error saving email'});
+                            } else {
+                                // user_auth 테이블에도 저장
+                                const userId = insertResults.insertId;
+                                const insertAuthQuery = 'INSERT INTO user_auth (user_table_id, email, auth_code) VALUES (?, ?, ?)';
+                                connection.query(insertAuthQuery, [userId, email, authCode], (authInsertError, authInsertResults) => {
+                                    if (authInsertError) {
+                                        console.error('Error saving auth code:', authInsertError);
+                                        res.status(500).json({error: 'Error saving auth code'});
+                                    } else {
+                                        console.log('Email and auth code saved successfully');
+                                        res.status(200).json({message: 'Email and auth code saved successfully'});
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            } else {
+                // 중복된 이메일이 있는 경우 예외 처리
+                console.error('Duplicate email found:', email);
+                res.status(400).json({ error: 'Duplicate email found' });
+            }
+        }
+    });
+
 
   } catch (error) {
     console.error('Error:', error);

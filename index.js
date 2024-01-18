@@ -174,7 +174,7 @@ app.post('/api/send-verification-email', async (req, res) => {
                                         res.status(500).json({error: 'Error saving auth code'});
                                     } else {
                                         console.log('Email and auth code saved successfully');
-                                        res.status(200).json({message: 'Email and auth code saved successfully'});
+                                        res.status(200).json({message: '이메일 인증 보안문자 전송이 완료되었습니다.'});
                                     }
                                 });
                             }

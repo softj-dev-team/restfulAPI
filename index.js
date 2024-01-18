@@ -14,8 +14,8 @@ dotenv.config(); // 환경 변수 로드
 const transporter = nodemailer.createTransport({
   service: 'Gmail', // Gmail을 사용하는 경우
   auth: {
-    user: gmailUser, // Gmail 이메일
-    pass: gmailPass, // Gmail 비밀번호
+    user:  process.env.gmailUser, // Gmail 이메일
+    pass:  process.env.gmailPass, // Gmail 비밀번호
   },
 });
 
@@ -140,7 +140,7 @@ app.post('/api/send-verification-email', async (req, res) => {
 
     // 이메일 전송
     const mailOptions = {
-      from: gmailUser,
+      from:  process.env.gmailUser,
       to: email,
       subject: '인증 코드',
       text: `인증 코드: ${authCode}`,

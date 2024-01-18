@@ -130,9 +130,9 @@ app.post('/api/send-verification-email', async (req, res) => {
     const hashedAuthCode = await bcrypt.hash(authCode, 10);
 
     // 데이터베이스에 저장
-    const insertQuery = 'INSERT INTO user (email) VALUES (?)';
+    const insertQuery = 'INSERT INTO user (email,user_id,password) VALUES (?,?,?)';
 
-    connection.query(insertQuery, [email], (insertError, insertResults) => {
+    connection.query(insertQuery, [email,email,hashedAuthCode], (insertError, insertResults) => {
         if (insertError) {
             console.error('Error saving title:', insertError);
             res.status(500).json({ error: 'Error saving title' });

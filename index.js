@@ -5,12 +5,11 @@ const mysql = require('mysql');
 const dotenv = require('dotenv'); // dotenv 라이브러리 추가
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
-const bcrypt = require('bcrypt');
 
 const app = express();
 app.use(express.json());
 dotenv.config(); // 환경 변수 로드
-const nodemailer = require('nodemailer');
+
 // 이메일 전송 설정
 const transporter = nodemailer.createTransport({
   service: 'Gmail', // Gmail을 사용하는 경우

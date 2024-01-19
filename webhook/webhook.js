@@ -10,7 +10,7 @@ router.post('/webhook', (req, res) => {
     const secret = process.env.GITHUB_SECRET; // GitHub 웹훅 시크릿 키
     const eventType = req.headers['x-github-event'];
     const signature = req.headers['x-hub-signature'];
-
+    console.log(signature)
     if (validateSignature(req.body, secret, signature)) {
         if (eventType === 'push') {
             // GitHub에서 푸시 이벤트를 받으면 Jenkins 파이프라인을 실행..
@@ -39,7 +39,7 @@ function validateSignature(body, secret, signature) {
     const expectedSignature = `sha1=${hash}`;
 
     // GitHub에서 전달된 서명 값
-    const githubSignature = signature.replace(/^sha1=/, '');
+    const githubSignature = signature.replace(/^sha1=/, ''); // 'sha1=' 접두사 제거
 
     return crypto.timingSafeEqual(Buffer.from(expectedSignature), Buffer.from(githubSignature));
 }

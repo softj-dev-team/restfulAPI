@@ -197,9 +197,10 @@ app.post('/api/send-verification-email', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
+// 정적 파일 제공 설정
+app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => {
-  res.send('Hello, HTTPS World!');
+    res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 const PORT = 3000;
 app.listen(PORT, () => {

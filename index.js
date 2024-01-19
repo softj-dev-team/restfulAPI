@@ -204,7 +204,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 // Include the webhook router
-const webhookRouter = require('./webhook');
+const webhookRouter = require('./webhook/webhook.js');
 // Use the webhook router for the '/webhook' endpoint
 app.use('/', webhookRouter);
 

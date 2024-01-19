@@ -37,7 +37,11 @@ function validateSignature(body, secret, signature) {
     const crypto = require('crypto');
     const hash = crypto.createHmac('sha1', secret).update(JSON.stringify(body)).digest('hex');
     const expectedSignature = `sha1=${hash}`;
-    return crypto.timingSafeEqual(Buffer.from(expectedSignature), Buffer.from(signature));
+
+    // GitHub에서 전달된 서명 값
+    const githubSignature = signature.replace(/^sha1=/, '');
+
+    return crypto.timingSafeEqual(Buffer.from(expectedSignature), Buffer.from(githubSignature));
 }
 
 module.exports = router;

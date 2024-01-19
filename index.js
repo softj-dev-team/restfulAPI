@@ -198,6 +198,51 @@ app.post('/api/send-verification-email', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+// API 엔드포인트 '/api/user-register'를 생성
+app.post('/api/user-register', async (req, res) => {
+  const { email, authCode } = req.body;
+
+  try {
+    // MySQL 연결 생성
+    const connection = await mysql.createConnection(connectionConfig);
+
+    // 이메일로 사용자 검색
+    const [userRows] = await connection.execute('SELECT * FROM user WHERE email = ?', [email]);
+
+    if (userRows.length === 0) {
+      throw new Error('사용자를 찾을 수 없습니다.');
+    }
+
+    const user = userRows[0];
+
+    // user.id로 user_auth 테이블에서 사용자 검색
+    const [userAuthRows] = await connection.execute('SELECT * FROM user_auth WHERE user_table_id = ?', [user.id]);
+
+    if (userAuthRows.length === 0) {
+      throw new Error('사용자 인증 정보를 찾을 수 없습니다.');
+    }
+
+    const userAuth = userAuthRows[0];
+
+    // bcrypt를 사용하여 인증 코드 비교
+    const isAuthCodeMatch = await bcrypt.compare(authCode, userAuth.auth_code);
+
+    if (!isAuthCodeMatch) {
+      throw new Error('인증 코드가 일치하지 않습니다.');
+    }
+
+    // status_cd를 1로 업데이트
+    await connection.execute('UPDATE user_auth SET status_cd = 1 WHERE user_table_id = ?', [user.id]);
+
+    // 연결 종료
+    await connection.end();
+
+    res.status(200).json({ message: '회원가입이 완료되었습니다.' });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(400).json({ message: '회원가입에 실패하였습니다.' });
+  }
+});
 // 정적 파일 제공 설정
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => {

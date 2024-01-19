@@ -7,10 +7,10 @@ const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const cors = require('cors');
 const app = express();
-app.use(express.json());
-dotenv.config(); // 환경 변수 로드
 // CORS 미들웨어 활성화
 app.use(cors());
+app.use(express.json());
+dotenv.config(); // 환경 변수 로드
 // 이메일 전송 설정
 const transporter = nodemailer.createTransport({
     service: 'Gmail', // Gmail을 사용하는 경우

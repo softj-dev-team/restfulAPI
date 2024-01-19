@@ -170,8 +170,8 @@ app.post('/api/send-verification-email', async (req, res) => {
                             } else {
                                 // user_auth 테이블에도 저장
                                 const userId = insertResults.insertId;
-                                const insertAuthQuery = 'INSERT INTO user_auth (user_table_id, email, auth_code) VALUES (?, ?, ?)';
-                                connection.query(insertAuthQuery, [userId, email, authCode], (authInsertError, authInsertResults) => {
+                                const insertAuthQuery = 'INSERT INTO user_auth (user_table_id, email, auth_code,status_cd) VALUES (?, ?, ?, ?)';
+                                connection.query(insertAuthQuery, [userId, email, authCode,0], (authInsertError, authInsertResults) => {
                                     if (authInsertError) {
                                         console.error('Error saving auth code:', authInsertError);
                                         res.status(500).json({error: 'Error saving auth code'});

@@ -184,7 +184,7 @@ app.post('/api/send-verification-email', async (req, res) => {
             } else {
                 // 중복된 이메일이 있는 경우 예외 처리
                 console.error('Duplicate email found:', email);
-                res.status(400).json({ error: 'Duplicate email found' });
+                res.status(400).json({ error: '이미 사용 중인 이메일입니다.' });
             }
         }
     });

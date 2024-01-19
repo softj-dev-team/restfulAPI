@@ -5,7 +5,7 @@ const mysql = require('mysql');
 const dotenv = require('dotenv'); // dotenv 라이브러리 추가
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
-
+const cors = require('cors');
 const app = express();
 app.use(express.json());
 dotenv.config(); // 환경 변수 로드

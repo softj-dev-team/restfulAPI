@@ -1,5 +1,6 @@
 // webhook.js
 const express = require('express');
+const dotenv = require('dotenv'); // dotenv 라이브러리 추가
 const { exec } = require('child_process');
 const router = express.Router();
 dotenv.config(); // 환경 변수 로드

@@ -9,7 +9,7 @@ pipeline {
         }
         stage('Pull from Git') {
             steps {
-                // Git 리포지토리에서 'main' 브랜치로 pull을 수행합니다...
+                // Git 리포지토리에서 'main' 브랜치로 pull을 수행합니다....
                 script {
                     sh "git pull origin main"
                 }

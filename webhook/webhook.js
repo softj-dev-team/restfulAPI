@@ -14,7 +14,7 @@ router.post('/webhook', (req, res) => {
     if (validateSignature(req.body, secret, signature)) {
         if (eventType === 'push') {
             // GitHub에서 푸시 이벤트를 받으면 Jenkins 파이프라인을 실행
-            exec('curl http://localhost:8080/job/your-job-name/build', (error, stdout, stderr) => {
+            exec('curl http://esaydroid.softj.net:8080/job/esayDroid/build', (error, stdout, stderr) => {
                 if (error) {
                     console.error(`Error executing Jenkins pipeline: ${error}`);
                     res.status(500).send('Internal Server Error');

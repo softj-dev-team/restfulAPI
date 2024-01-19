@@ -14,12 +14,21 @@ router.post('/webhook', (req, res) => {
     if (validateSignature(req.body, secret, signature)) {
         if (eventType === 'push') {
             // GitHub에서 푸시 이벤트를 받으면 Jenkins 파이프라인을 실행
-            exec('curl http://esaydroid.softj.net:8080/job/esayDroid/build', (error, stdout, stderr) => {
+            // exec('curl http://esaydroid.softj.net:8080/job/esayDroid/build', (error, stdout, stderr) => {
+            //     if (error) {
+            //         console.error(`Error executing Jenkins pipeline: ${error}`);
+            //         res.status(500).send('Internal Server Error');
+            //     } else {
+            //         console.log('Jenkins pipeline triggered successfully');
+            //         res.status(200).send('OK');
+            //     }
+            // });
+             exec('cd /home/ec2-user/searchapps && git pull origin main', (error, stdout, stderr) => {
                 if (error) {
-                    console.error(`Error executing Jenkins pipeline: ${error}`);
+                    console.error(`Error executing git pull: ${error}`);
                     res.status(500).send('Internal Server Error');
                 } else {
-                    console.log('Jenkins pipeline triggered successfully');
+                    console.log('Git pull executed successfully');
                     res.status(200).send('OK');
                 }
             });

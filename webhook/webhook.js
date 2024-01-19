@@ -10,10 +10,6 @@ router.post('/webhook', (req, res) => {
     const secret = process.env.GITHUB_SECRET; // GitHub 웹훅 시크릿 키
     const eventType = req.headers['x-github-event'];
     const signature = req.headers['x-hub-signature'];
-    console.log(signature)
-    const expectedSignature = `sha1=${hash}`;
-    const githubSignature = signature.replace(/^sha1=/, '');
-    console.log('Expected Signature Length:', expectedSignature.length);
     console.log('GitHub Signature Length:', githubSignature.length);
     if (validateSignature(req.body, secret, signature)) {
         if (eventType === 'push') {
@@ -41,6 +37,9 @@ function validateSignature(body, secret, signature) {
     const crypto = require('crypto');
     const hash = crypto.createHmac('sha1', secret).update(JSON.stringify(body)).digest('hex');
     const expectedSignature = `sha1=${hash}`;
+
+
+    console.log('Expected Signature Length:', expectedSignature.length);
 
     // GitHub에서 전달된 서명 값
     const githubSignature = signature.replace(/^sha1=/, ''); // 'sha1=' 접두사 제거

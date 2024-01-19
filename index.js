@@ -7,6 +7,7 @@ const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const cors = require('cors');
 const express = require('express');
+const path = require('path');
 const app = express();
 // CORS 미들웨어 활성화
 app.use(cors());

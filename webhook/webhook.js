@@ -7,7 +7,7 @@ dotenv.config(); // 환경 변수 로드
 router.use(express.json());
 
 router.post('/webhook', (req, res) => {
-    const secret = process.env.GIGHUB_SECRET; // GitHub 웹훅 시크릿 키
+    const secret = process.env.GITHUB_SECRET; // GitHub 웹훅 시크릿 키
     const eventType = req.headers['x-github-event'];
     const signature = req.headers['x-hub-signature'];
 

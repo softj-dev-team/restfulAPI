@@ -10,7 +10,7 @@ router.post('/webhook', (req, res) => {
     const secret = process.env.GITHUB_SECRET; // GitHub 웹훅 시크릿 키
     const eventType = req.headers['x-github-event'];
     const signature = req.headers['x-hub-signature'];
-    console.log('GitHub Signature Length:', githubSignature.length);
+    console.log('GitHub Signature Length:', signature.length);
     if (validateSignature(req.body, secret, signature)) {
         if (eventType === 'push') {
             // GitHub에서 푸시 이벤트를 받으면 Jenkins 파이프라인을 실행..

@@ -13,7 +13,7 @@ router.post('/webhook', (req, res) => {
 
     if (validateSignature(req.body, secret, signature)) {
         if (eventType === 'push') {
-            // GitHub에서 푸시 이벤트를 받으면 Jenkins 파이프라인을 실행
+            // GitHub에서 푸시 이벤트를 받으면 Jenkins 파이프라인을 실행..
             exec('curl http://ec2-13-125-21-168.ap-northeast-2.compute.amazonaws.com:8080/job/esayDroid/build', (error, stdout, stderr) => {
                 if (error) {
                     console.error(`Error executing Jenkins pipeline: ${error}`);

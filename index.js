@@ -92,26 +92,33 @@ app.post('/api/save-title', async (req, res) => {
 });
 
 // 타이틀 검색 API
-app.get('/api/search-title/:id', (req, res) => {
-    const id = req.params.id;
+app.get('/api/search-title/:id', async (req, res) => {
+    try {
+        // 데이터베이스 연결 생성
+        const connection = await createDatabaseConnection();
 
-    // 데이터베이스에서 id에 해당하는 title 검색
-    const query = 'SELECT title FROM video WHERE id = ?';
-    connection.query(query, [id], (error, results) => {
-        if (error) {
-            console.error('Error searching title:', error);
-            res.status(500).json({ error: 'Error searching title' });
+        const id = req.params.id;
+        const query = 'SELECT title FROM video WHERE id = ?';
+
+        // 데이터베이스 쿼리 실행
+        const [results] = await connection.execute(query, [id]);
+
+        if (results.length > 0) {
+            const title = results[0].title;
+            console.log('Title search successful');
+            res.status(200).json({ title });
         } else {
-            if (results.length > 0) {
-                const title = results[0].title;
-                console.log('Title search successful');
-                res.status(200).json({ title });
-            } else {
-                res.status(404).json({ error: 'Title not found' });
-            }
+            res.status(404).json({ error: 'Title not found' });
         }
-    });
+
+        // 연결 종료
+        await connection.end();
+    } catch (error) {
+        console.error('Error searching title:', error);
+        res.status(500).json({ error: 'Error searching title' });
+    }
 });
+
 // 모든 레코드 리스트 가져오는 API
 app.get('/api/get-all-records', (req, res) => {
   // 데이터베이스에서 모든 레코드 가져오기

@@ -201,7 +201,7 @@ app.post('/api/user-register', async (req, res) => {
 
   try {
     // MySQL 연결 생성
-    const connection = await mysql.createConnection(connectionConfig);
+    const connection = await mysql.createDatabaseConnection(connectionConfig);
 
     // 이메일로 사용자 검색
     const [userRows] = await connection.execute('SELECT * FROM user WHERE email = ?', [email]);

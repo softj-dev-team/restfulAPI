@@ -173,13 +173,13 @@ app.post('/api/send-verification-email', async (req, res) => {
           res.status(500).json({ error: '이메일 전송 실패' });
         } else {
           // 이메일 전송이 성공하면 사용자 정보 저장
-          const insertQuery = 'INSERT INTO user (email, user_id, password) VALUES (?, ?, ?)';
-          await connection.execute(insertQuery, [email, email, hashedAuthCode]);
+          const insertQuery = 'INSERT INTO user (email, user_id) VALUES (?, ?, ?)';
+          await connection.execute(insertQuery, [email, email]);
 
           // 인증 코드 저장
           const userId = insertResults.insertId;
           const insertAuthQuery = 'INSERT INTO user_auth (user_table_id, email, auth_code, status_cd) VALUES (?, ?, ?, ?)';
-          await connection.execute(insertAuthQuery, [userId, email, authCode, 0]);
+          await connection.execute(insertAuthQuery, [userId, email, hashedAuthCode, 0]);
 
           res.status(200).json({ message: '이메일 인증 보안문자 전송이 완료되었습니다.' });
         }

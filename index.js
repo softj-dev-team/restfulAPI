@@ -1,7 +1,7 @@
 
 const { google } = require('googleapis');
 const bodyParser = require('body-parser');
-const mysql = require('mysql');
+const mysql = require('mysql2/promise');
 const dotenv = require('dotenv'); // dotenv 라이브러리 추가
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');

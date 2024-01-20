@@ -226,26 +226,33 @@ app.post('/api/user-register', async (req, res) => {
         const [userAuthRows] = await connection.execute('SELECT * FROM user_auth WHERE user_table_id = ?', [user.id]);
 
         if (userAuthRows.length === 0) {
-            throw new Error('사용자 인증 정보를 찾을 수 없습니다.');
+            throw new Error('이미 회원 가입이 완료된 사용자입니다.');
         }
 
         const userAuth = userAuthRows[0];
 
-        // bcrypt를 사용하여 인증 코드 비교
-        const isAuthCodeMatch = await bcrypt.compare(authCode, userAuth.auth_code);
+        // 이미 인증된 사용자인지 확인
+        if (userAuth.status_cd === 1) {
+             res.status(200).json({message: '이미 인증이 완료된 사용자입니다.'});
+        }else{
+             // bcrypt를 사용하여 인증 코드 비교
+            const isAuthCodeMatch = await bcrypt.compare(authCode, userAuth.auth_code);
 
-        if (!isAuthCodeMatch) {
-            const AuthMessage = "인증 코드가 일치하지 않습니다."
-            res.status(400).json({ message: AuthMessage });
-        } else {
-            // status_cd를 1로 업데이트
-            await connection.execute('UPDATE user_auth SET status_cd = 1 WHERE user_table_id = ?', [user.id]);
+            if (!isAuthCodeMatch) {
+                const AuthMessage = "인증 코드가 일치하지 않습니다."
+                res.status(400).json({message: AuthMessage});
+            } else {
+                // status_cd를 1로 업데이트
+                await connection.execute('UPDATE user_auth SET status_cd = 1 WHERE user_table_id = ?', [user.id]);
 
-            // 연결 종료
-            await connection.end();
+                // 연결 종료
+                await connection.end();
 
-            res.status(200).json({ message: '회원가입이 완료되었습니다. 초기 비밀번호는 이메일 인증 코드 입니다.' });
+                res.status(200).json({message: '회원가입이 완료되었습니다. 초기 비밀번호는 이메일 인증 코드 입니다.'});
+            }
         }
+
+
     } catch (error) {
         console.error('Error:', error);
         res.status(400).json({ message: error.message || '회원가입에 실패하였습니다.' });

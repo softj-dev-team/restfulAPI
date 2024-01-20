@@ -187,7 +187,7 @@ async function sendVerificationEmail(email, authCode) {
     const emailInfo = await transporter.sendMail(mailOptions);
 
     // 사용자 테이블에 이메일 및 해싱된 코드 저장
-    const [insertUserResult] = await connection.execute('INSERT INTO user (email) VALUES (?)', [email]);
+    const [insertUserResult] = await connection.execute('INSERT INTO user (email) VALUES (?, ?)', [email, email]);
     const userId = insertUserResult.insertId;
 
     // user_auth 테이블에 데이터 저장

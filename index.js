@@ -244,7 +244,7 @@ app.post('/api/user-register', async (req, res) => {
             // 연결 종료
             await connection.end();
 
-            res.status(200).json({ message: '회원가입이 완료되었습니다.' });
+            res.status(200).json({ message: '회원가입이 완료되었습니다. 초기비밀번호는 이메일 인증 코드 입니다.' });
         }
     } catch (error) {
         console.error('Error:', error);

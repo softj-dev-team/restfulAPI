@@ -143,18 +143,18 @@ app.get('/api/get-all-records', async (req, res) => {
 // POST 요청 핸들러
 app.post('/api/send-verification-email', async (req, res) => {
     try {
-        const {email} = req.body;
+        const { email } = req.body;
 
         const emailSent = await sendVerificationEmail(email);
 
         if (emailSent) {
-            res.status(200).json({message: '이메일 인증 보안문자 전송이 완료되었습니다.'});
+            res.status(200).json({ message: '이메일 인증 보안문자 전송이 완료되었습니다.' });
         } else {
-            res.status(500).json({error: '이메일 전송 실패'});
+            res.status(500).json({ error: '이메일 전송 실패' });
         }
     } catch (error) {
         console.error('오류:', error);
-        res.status(500).json({error: '서버 내부 오류'});
+        res.status(500).json({ error: error.message || '서버 내부 오류' });
     }
 });
 
@@ -201,7 +201,7 @@ async function sendVerificationEmail(email, authCode) {
         return true;
     } catch (error) {
         console.error('오류:', error);
-        return false;
+        throw error; // 오류를 상위 핸들러로 다시 던집니다.
     }
 }
 
@@ -230,28 +230,23 @@ app.post('/api/user-register', async (req, res) => {
         }
 
         const userAuth = userAuthRows[0];
-
         // 이미 인증된 사용자인지 확인
         if (userAuth.status_cd === 1) {
              res.status(200).json({message: '이미 인증이 완료된 사용자입니다.'});
         }else{
              // bcrypt를 사용하여 인증 코드 비교
             const isAuthCodeMatch = await bcrypt.compare(authCode, userAuth.auth_code);
-
             if (!isAuthCodeMatch) {
                 const AuthMessage = "인증 코드가 일치하지 않습니다."
                 res.status(400).json({message: AuthMessage});
             } else {
                 // status_cd를 1로 업데이트
                 await connection.execute('UPDATE user_auth SET status_cd = 1 WHERE user_table_id = ?', [user.id]);
-
                 // 연결 종료
                 await connection.end();
-
                 res.status(200).json({message: '회원가입이 완료되었습니다. 초기 비밀번호는 이메일 인증 코드 입니다.'});
             }
         }
-
 
     } catch (error) {
         console.error('Error:', error);

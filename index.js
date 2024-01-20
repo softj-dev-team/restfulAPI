@@ -60,7 +60,7 @@ app.post('/api/save-title', async (req, res) => {
 
         const user_id = req.body.user_id;
         const title = req.body.title;
-         const keyword = req.body.keyword;
+        const keyword = req.body.keyword;
         const id = req.body.id; // 추가: id를 요청에서 받음
 
         if (id) {
@@ -121,14 +121,16 @@ app.get('/api/search-title/:id', async (req, res) => {
 
 // 모든 레코드 리스트 가져오는 API
 app.get('/api/get-all-records', async (req, res) => {
+    const user_id = req.body.user_id;
+    const title = req.body.title;
+    const keyword = req.body.keyword;
+    const id = req.body.id; // 추가: id를 요청에서 받음
     try {
         // 데이터베이스 연결 생성
         const connection = await createDatabaseConnection();
 
-        const query = 'SELECT id, title, reg_date FROM video';
-
         // 데이터베이스 쿼리 실행
-        const [results] = await connection.execute(query);
+        const [results] = await connection.execute('SELECT id, title,keyword, reg_date FROM video where user_id=?',[user_id]);
 
         console.log('Records fetched successfully');
         res.status(200).json(results);

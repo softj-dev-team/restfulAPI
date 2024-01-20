@@ -120,19 +120,27 @@ app.get('/api/search-title/:id', async (req, res) => {
 });
 
 // 모든 레코드 리스트 가져오는 API
-app.get('/api/get-all-records', (req, res) => {
-  // 데이터베이스에서 모든 레코드 가져오기
-  const query = 'SELECT id, title, reg_date FROM video';
-  connection.query(query, (error, results) => {
-    if (error) {
-      console.error('Error fetching records:', error);
-      res.status(500).json({ error: 'Error fetching records' });
-    } else {
-      console.log('Records fetched successfully');
-      res.status(200).json(results);
+app.get('/api/get-all-records', async (req, res) => {
+    try {
+        // 데이터베이스 연결 생성
+        const connection = await createDatabaseConnection();
+
+        const query = 'SELECT id, title, reg_date FROM video';
+
+        // 데이터베이스 쿼리 실행
+        const [results] = await connection.execute(query);
+
+        console.log('Records fetched successfully');
+        res.status(200).json(results);
+
+        // 연결 종료
+        await connection.end();
+    } catch (error) {
+        console.error('Error fetching records:', error);
+        res.status(500).json({ error: 'Error fetching records' });
     }
-  });
 });
+
 // POST 요청 핸들러
 app.post('/api/send-verification-email', async (req, res) => {
   try {

@@ -60,26 +60,27 @@ app.post('/api/save-title', async (req, res) => {
 
         const user_id = req.body.user_id;
         const title = req.body.title;
+         const keyword = req.body.keyword;
         const id = req.body.id; // 추가: id를 요청에서 받음
 
         if (id) {
             // id가 제공된 경우, 해당 id에 대한 title을 업데이트
-            const updateQuery = 'UPDATE video SET title = ? WHERE id = ?';
-            const [updateResults] = await connection.execute(updateQuery, [title, id]);
+            const updateQuery = 'UPDATE video SET title = ?,keyword = ? WHERE id = ?';
+            const [updateResults] = await connection.execute(updateQuery, [title,keyword, id]);
 
             if (updateResults.affectedRows === 0) {
                 res.status(404).json({error: 'Title not found for the provided id'});
             } else {
                 console.log('Title updated successfully');
-                res.status(200).json({message: 'Title updated successfully'});
+                res.status(200).json({message: '성공적으로 저장 되었습니다.'});
             }
         } else {
             // id가 제공되지 않은 경우, 새로운 데이터 삽입
-            const insertQuery = 'INSERT INTO video (user_id, title) VALUES (?, ?)';
-            const [insertResults] = await connection.execute(insertQuery, [user_id, title]);
+            const insertQuery = 'INSERT INTO video (user_id, title,keyword) VALUES (?, ?, ?)';
+            const [insertResults] = await connection.execute(insertQuery, [user_id, title,keyword]);
 
             console.log('Title saved successfully');
-            res.status(200).json({message: 'Title saved successfully'});
+            res.status(200).json({message: '성공적으로 저장 되었습니다.'});
         }
 
         // 연결 종료

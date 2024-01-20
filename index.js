@@ -253,6 +253,48 @@ app.post('/api/user-register', async (req, res) => {
         res.status(400).json({ message: error.message || '회원가입에 실패하였습니다.' });
     }
 });
+// POST 요청 핸들러 - 로그인 API
+app.post('/api/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // MySQL 연결 생성
+        const connection = await createDatabaseConnection();
+
+        // 사용자 이메일로 데이터베이스에서 사용자 정보를 검색
+        const [userRows] = await connection.execute('SELECT * FROM user WHERE email = ?', [email]);
+
+        if (userRows.length === 0) {
+            throw new Error('사용자를 찾을 수 없습니다.');
+        }
+
+        const user = userRows[0];
+
+        // user.id로 user_auth 테이블에서 사용자 인증 정보 검색
+        const [userAuthRows] = await connection.execute('SELECT * FROM user_auth WHERE user_table_id = ?', [user.id]);
+
+        if (userAuthRows.length === 0) {
+            throw new Error('사용자 인증 정보를 찾을 수 없습니다.');
+        }
+
+        const userAuth = userAuthRows[0];
+
+        // bcrypt를 사용하여 비밀번호 비교
+        const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+        if (!isPasswordMatch) {
+            throw new Error('비밀번호가 일치하지 않습니다.');
+        }
+
+        // 연결 종료
+        await connection.end();
+
+        res.status(200).json({ message: '로그인이 성공하였습니다.' });
+    } catch (error) {
+        console.error('오류:', error);
+        res.status(401).json({ error: error.message || '로그인에 실패하였습니다.' });
+    }
+});
 // 정적 파일 제공 설정
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => {

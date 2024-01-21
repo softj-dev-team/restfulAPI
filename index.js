@@ -117,6 +117,36 @@ app.post('/api/create-run-task', async (req, res) => {
         res.status(500).json({ error: '서버 내부 오류' });
     }
 });
+app.delete('/api/delete-video/:id', async (req, res) => {
+    const id = req.params.id;
+
+    if (!id) {
+        res.status(400).json({ error: 'Video ID is missing' });
+        return;
+    }
+
+    try {
+        // 데이터베이스 연결 생성
+        const connection = await createDatabaseConnection();
+
+        // video 삭제 쿼리 실행
+        const deleteQuery = 'DELETE FROM video WHERE id = ?';
+        const [deleteResults] = await connection.execute(deleteQuery, [id]);
+
+        if (deleteResults.affectedRows === 0) {
+            res.status(404).json({ error: 'Video not found for the provided ID' });
+        } else {
+            console.log('Video deleted successfully');
+            res.status(200).json({ message: 'Video deleted successfully' });
+        }
+
+        // 연결 종료
+        await connection.end();
+    } catch (error) {
+        console.error('Error deleting video:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 // 타이틀 검색 API
 app.get('/api/search-title', async (req, res) => {
     try {

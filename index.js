@@ -123,7 +123,7 @@ app.get('/api/search-title', async (req, res) => {
         // 데이터베이스 연결 생성
         const connection = await createDatabaseConnection();
 
-        const getIdQuery = 'SELECT video_id FROM run_task WHERE run_status_cd = ?';
+        const getIdQuery = 'SELECT id,video_id FROM run_task WHERE run_status_cd = ?';
         const [getIdResults] = await connection.execute(getIdQuery, [0]);
 
         if (getIdResults.length === 0) {
@@ -132,12 +132,15 @@ app.get('/api/search-title', async (req, res) => {
         }
 
         const id = getIdResults[0].video_id;
+        const runTaskID = getIdResults[0].id;
         const query = 'SELECT title, keyword FROM video WHERE id = ?';
 
         // 데이터베이스 쿼리 실행
         const [results] = await connection.execute(query, [id]);
 
         if (results.length > 0) {
+             const updateQuery = 'UPDATE run_task SET run_status_cd = ? WHERE id = ?';
+            const [updateResults] = await connection.execute(updateQuery, [1, runTaskID]);
             console.log('Title search successful');
             res.status(200).json(results[0]);
         } else {

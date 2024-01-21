@@ -98,7 +98,7 @@ app.get('/api/search-title/:id', async (req, res) => {
         const connection = await createDatabaseConnection();
 
         const id = req.params.id;
-        const query = 'SELECT title FROM video WHERE id = ?';
+        const query = 'SELECT title,keyword FROM video WHERE id = ?';
 
         // 데이터베이스 쿼리 실행
         const [results] = await connection.execute(query, [id]);

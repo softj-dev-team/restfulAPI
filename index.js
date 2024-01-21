@@ -99,18 +99,8 @@ app.post('/api/create-run-task', async (req, res) => {
         // 데이터베이스 연결 생성
         const connection = await createDatabaseConnection();
 
-        // 이메일로 사용자 검색
-        const [userRows] = await connection.execute('SELECT id FROM user WHERE email = ?', [email]);
-
-        if (userRows.length === 0) {
-            res.status(404).json({ error: '사용자를 찾을 수 없습니다.' });
-            return;
-        }
-
-        const userId = userRows[0].id;
-
         // 이메일로 검색한 사용자의 video 중 use_status_cd가 1인 비디오 가져오기
-        const [videoRows] = await connection.execute('SELECT id FROM video WHERE user_id = ? AND use_status_cd = 1', [userId]);
+        const [videoRows] = await connection.execute('SELECT id FROM video WHERE user_id = ? AND use_status_cd = 1', [email]);
         const videoId = videoRows[0].id;
 
         // run_task 테이블에 새로운 row 생성 (video_id, run_status_cd)

@@ -120,7 +120,7 @@ app.get('/api/search-title/:id', async (req, res) => {
 });
 
 // 모든 레코드 리스트 가져오는 API
-app.get('/api/get-all-records', async (req, res) => {
+app.post('/api/get-all-records', async (req, res) => {
     const user_id = req.body.user_id;
     const title = req.body.title;
     const keyword = req.body.keyword;

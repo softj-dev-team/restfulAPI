@@ -90,7 +90,49 @@ app.post('/api/save-title', async (req, res) => {
         res.status(500).json({error: 'Internal Server Error'});
     }
 });
+//작업 스케쥴러
+// POST 요청 핸들러
+app.post('/api/create-run-task', async (req, res) => {
+    const { email } = req.body;
 
+    try {
+        // 데이터베이스 연결 생성
+        const connection = await createDatabaseConnection();
+
+        // 이메일로 사용자 검색
+        const [userRows] = await connection.execute('SELECT id FROM user WHERE email = ?', [email]);
+
+        if (userRows.length === 0) {
+            res.status(404).json({ error: '사용자를 찾을 수 없습니다.' });
+            return;
+        }
+
+        const userId = userRows[0].id;
+
+        // 이메일로 검색한 사용자의 video 중 use_status_cd가 1인 비디오 가져오기
+        const [videoRows] = await connection.execute('SELECT id FROM video WHERE user_id = ? AND use_status_cd = 1', [userId]);
+
+        if (videoRows.length === 0) {
+            res.status(404).json({ error: '사용 가능한 비디오가 없습니다.' });
+            return;
+        }
+
+        const videoId = videoRows[0].id;
+
+        // run_task 테이블에 새로운 row 생성 (video_id, run_status_cd)
+        const insertQuery = 'INSERT INTO run_task (video_id, run_status_cd) VALUES (?, ?)';
+        await connection.execute(insertQuery, [videoId, 0]);
+
+        console.log('Run task created successfully');
+        res.status(200).json({ message: 'Run task created successfully' });
+
+        // 연결 종료
+        await connection.end();
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: '서버 내부 오류' });
+    }
+});
 // 타이틀 검색 API
 app.get('/api/search-title/:id', async (req, res) => {
     try {

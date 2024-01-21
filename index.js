@@ -113,17 +113,16 @@ app.post('/api/create-run-task', async (req, res) => {
         const [videoRows] = await connection.execute('SELECT id FROM video WHERE user_id = ? AND use_status_cd = 0', [userId]);
 
         if (videoRows.length === 0) {
-            res.status(404).json({ error: '사용 가능한 비디오가 없습니다.' });
+            const videoId = videoRows[0].id;
+            // run_task 테이블에 새로운 row 생성 (video_id, run_status_cd)
+            const insertQuery = 'INSERT INTO run_task (video_id, run_status_cd) VALUES (?, ?)';
+            await connection.execute(insertQuery, [videoId, 0]);
+            return;
+        }else{
+            res.status(404).json({ error: '대기중인작업이 있습니다. 잠시후 다시 실행 하세요' });
             return;
         }
 
-        const videoId = videoRows[0].id;
-
-        // run_task 테이블에 새로운 row 생성 (video_id, run_status_cd)
-        const insertQuery = 'INSERT INTO run_task (video_id, run_status_cd) VALUES (?, ?)';
-        await connection.execute(insertQuery, [videoId, 0]);
-
-        console.log('Run task created successfully');
         res.status(200).json({ message: 'Run task created successfully' });
 
         // 연결 종료

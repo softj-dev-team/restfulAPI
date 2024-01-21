@@ -118,12 +118,14 @@ app.post('/api/create-run-task', async (req, res) => {
     }
 });
 // 타이틀 검색 API
-app.get('/api/search-title/:id', async (req, res) => {
+app.get('/api/search-title', async (req, res) => {
     try {
         // 데이터베이스 연결 생성
         const connection = await createDatabaseConnection();
 
-        const id = req.params.id;
+        const getIdQuery = 'SELECT video_id FROM run_task WHERE  run_status_cd= ?';
+        const [getIdResults] = await connection.execute(getIdQuery, [0]);
+        const id =  getIdResults[0].id;
         const query = 'SELECT title,keyword FROM video WHERE id = ?';
 
         // 데이터베이스 쿼리 실행

@@ -109,8 +109,8 @@ app.post('/api/create-run-task', async (req, res) => {
 
         const userId = userRows[0].id;
 
-        // 이메일로 검색한 사용자의 video 중 use_status_cd가 1인 비디오 가져오기
-        const [videoRows] = await connection.execute('SELECT id FROM video WHERE user_id = ? AND use_status_cd = 1', [userId]);
+        // 이메일로 검색한 사용자의 video 중 use_status_cd가 0인 비디오 가져오기
+        const [videoRows] = await connection.execute('SELECT id FROM video WHERE user_id = ? AND use_status_cd = 0', [userId]);
 
         if (videoRows.length === 0) {
             res.status(404).json({ error: '사용 가능한 비디오가 없습니다.' });

@@ -118,31 +118,7 @@ app.get('/api/search-title/:id', async (req, res) => {
         res.status(500).json({error: 'Error searching title'});
     }
 });
-// 모든 레코드 리스트 가져오는 API
-app.post('/api/vedio-status-row', async (req, res) => {
-    const user_id = req.body.user_id;
-    const title = req.body.title;
-    const keyword = req.body.keyword;
-    const id = req.body.id; // 추가: id를 요청에서 받음
-    try {
-        // 데이터베이스 연결 생성
-        const connection = await createDatabaseConnection();
 
-        // 데이터베이스 쿼리 실행
-        const [results] = await connection.execute('SELECT * FROM video where user_id=? and use_status_cd=?',[user_id],[1]);
-        if (results[0].count <= 0) {
-            throw new Error('실행하려면 아래 목록을 선택하세요');
-        }
-        console.log('Records fetched successfully');
-        res.status(200).json(results);
-
-        // 연결 종료
-        await connection.end();
-    } catch (error) {
-        console.error('Error fetching records:', error);
-        res.status(500).json({error: 'Error fetching records'});
-    }
-});
 // 모든 레코드 리스트 가져오는 API
 app.post('/api/get-all-records', async (req, res) => {
     const user_id = req.body.user_id;
@@ -154,7 +130,7 @@ app.post('/api/get-all-records', async (req, res) => {
         const connection = await createDatabaseConnection();
 
         // 데이터베이스 쿼리 실행
-        const [results] = await connection.execute('SELECT id, title,keyword, reg_date FROM video where user_id=?',[user_id]);
+        const [results] = await connection.execute('SELECT id, title,keyword, reg_date, use_status_cd FROM video where user_id=?',[user_id]);
 
         console.log('Records fetched successfully');
         res.status(200).json(results);

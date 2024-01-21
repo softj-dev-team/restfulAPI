@@ -123,27 +123,32 @@ app.get('/api/search-title', async (req, res) => {
         // 데이터베이스 연결 생성
         const connection = await createDatabaseConnection();
 
-        const getIdQuery = 'SELECT video_id FROM run_task WHERE  run_status_cd= ?';
+        const getIdQuery = 'SELECT video_id FROM run_task WHERE run_status_cd = ?';
         const [getIdResults] = await connection.execute(getIdQuery, [0]);
-        const id =  getIdResults[0];
-        const query = 'SELECT title,keyword FROM video WHERE id = ?';
+
+        if (getIdResults.length === 0) {
+            res.status(404).json({ error: 'Run task with run_status_cd=0 not found' });
+            return;
+        }
+
+        const id = getIdResults[0].video_id;
+        const query = 'SELECT title, keyword FROM video WHERE id = ?';
 
         // 데이터베이스 쿼리 실행
         const [results] = await connection.execute(query, [id]);
 
         if (results.length > 0) {
-            const title = results[0].title;
             console.log('Title search successful');
             res.status(200).json(results[0]);
         } else {
-            res.status(404).json({error: 'Title not found'});
+            res.status(404).json({ error: 'Title not found' });
         }
 
         // 연결 종료
         await connection.end();
     } catch (error) {
         console.error('Error searching title:', error);
-        res.status(500).json({error: 'Error searching title'});
+        res.status(500).json({ error: 'Error searching title' });
     }
 });
 //video title 사용 여부 갱신

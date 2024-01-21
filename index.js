@@ -125,7 +125,7 @@ app.get('/api/search-title', async (req, res) => {
 
         const getIdQuery = 'SELECT video_id FROM run_task WHERE  run_status_cd= ?';
         const [getIdResults] = await connection.execute(getIdQuery, [0]);
-        const id =  getIdResults[0].id;
+        const id =  getIdResults[0];
         const query = 'SELECT title,keyword FROM video WHERE id = ?';
 
         // 데이터베이스 쿼리 실행

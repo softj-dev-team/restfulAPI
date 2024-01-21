@@ -118,7 +118,37 @@ app.get('/api/search-title/:id', async (req, res) => {
         res.status(500).json({error: 'Error searching title'});
     }
 });
+//video title 사용 여부 갱신
+app.post('/api/use-status-change', async (req, res) => {
+    const id = req.body.id;
 
+    try {
+        // 데이터베이스 연결 생성
+        const connection = await createDatabaseConnection();
+
+        // 이미 use_status_cd가 1이었던 row를 0으로 업데이트
+        const updateZeroQuery = 'UPDATE video SET use_status_cd = 0 WHERE use_status_cd = 1';
+        await connection.execute(updateZeroQuery);
+
+        // 입력받은 id와 일치하는 row의 use_status_cd를 1로 업데이트
+        const updateOneQuery = 'UPDATE video SET use_status_cd = 1 WHERE id = ?';
+        const [updateResults] = await connection.execute(updateOneQuery, [id]);
+
+        if (updateResults.affectedRows === 0) {
+            // 일치하는 id를 찾지 못한 경우
+            res.status(404).json({error: '일치하는 ID를 찾을 수 없습니다.'});
+        } else {
+            console.log('Records updated successfully');
+            res.status(200).json({message: 'Records updated successfully'});
+        }
+
+        // 연결 종료
+        await connection.end();
+    } catch (error) {
+        console.error('Error updating records:', error);
+        res.status(500).json({error: 'Error updating records'});
+    }
+});
 // 모든 레코드 리스트 가져오는 API
 app.post('/api/get-all-records', async (req, res) => {
     const user_id = req.body.user_id;

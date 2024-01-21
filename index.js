@@ -106,7 +106,7 @@ app.get('/api/search-title/:id', async (req, res) => {
         if (results.length > 0) {
             const title = results[0].title;
             console.log('Title search successful');
-            res.status(200).json({title});
+            res.status(200).json(results[0]);
         } else {
             res.status(404).json({error: 'Title not found'});
         }

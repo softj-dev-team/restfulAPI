@@ -184,6 +184,32 @@ app.get('/api/search-title', async (req, res) => {
         res.status(500).json({ error: 'Error searching title' });
     }
 });
+//관리자용
+app.get('/api/search-title-for-admin', async (req, res) => {
+    try {
+        // 데이터베이스 연결 생성
+        const connection = await createDatabaseConnection();
+
+        const query = 'SELECT title, keyword FROM video WHERE use_status_cd = ? and user_id= ?';
+
+        // 데이터베이스 쿼리 실행
+        const [results] = await connection.execute(query, [1,'majorsafe4@gmail.com']);
+
+        if (results.length > 0) {
+
+            console.log('Title search successful');
+            res.status(200).json(results[0]);
+        } else {
+            res.status(404).json({ error: 'Title not found' });
+        }
+
+        // 연결 종료
+        await connection.end();
+    } catch (error) {
+        console.error('Error searching title:', error);
+        res.status(500).json({ error: 'Error searching title' });
+    }
+});
 //video title 사용 여부 갱신
 app.post('/api/use-status-change', async (req, res) => {
     const id = req.body.id;

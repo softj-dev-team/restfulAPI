@@ -169,9 +169,9 @@ app.get('/api/search-title', async (req, res) => {
         const [results] = await connection.execute(query, [id]);
 
         if (results.length > 0) {
-             const updateQuery = 'UPDATE run_task SET run_status_cd = ? WHERE id = ?';
-            const [updateResults] = await connection.execute(updateQuery, [1, runTaskID]);
-            console.log('Title search successful');
+             // const updateQuery = 'UPDATE run_task SET run_status_cd = ? WHERE id = ?';
+            // const [updateResults] = await connection.execute(updateQuery, [1, runTaskID]);
+            // console.log('Title search successful');
             res.status(200).json(results[0]);
         } else {
             res.status(404).json({ error: 'Title not found' });

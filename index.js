@@ -103,6 +103,16 @@ app.post('/api/create-run-task', async (req, res) => {
         const [videoRows] = await connection.execute('SELECT id FROM video WHERE user_id = ? AND use_status_cd = 1', [email]);
         const videoId = videoRows[0].id;
 
+        const [videoTaskRows] = await connection.execute('SELECT id FROM video WHERE user_id = ? ', [email]);
+        // //다음 작업이 들어오면 타스크 종료
+        // videoRows에서 각 video.id에 대해 업데이트를 수행
+        for (const row of videoTaskRows) {
+            const videoId = row.id;
+
+            // 다음 작업이 들어오면 타스크 종료
+            const updateQuery = 'UPDATE run_task SET run_status_cd = ? WHERE video_id = ?';
+            const [updateResults] = await connection.execute(updateQuery, [1, videoId]);
+        }
         // run_task 테이블에 새로운 row 생성 (video_id, run_status_cd)
         const insertQuery = 'INSERT INTO run_task (video_id, run_status_cd) VALUES (?, ?)';
         await connection.execute(insertQuery, [videoId, 0]);

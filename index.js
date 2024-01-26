@@ -94,7 +94,8 @@ app.post('/api/save-title', async (req, res) => {
 // POST 요청 핸들러
 app.post('/api/create-run-task', async (req, res) => {
     const { email } = req.body;
-
+    const { use_random_play } = req.body;
+    const { use_filter } = req.body;
     try {
         // 데이터베이스 연결 생성
         const connection = await createDatabaseConnection();
@@ -114,8 +115,8 @@ app.post('/api/create-run-task', async (req, res) => {
             const [updateResults] = await connection.execute(updateQuery, [1, videoId]);
         }
         // run_task 테이블에 새로운 row 생성 (video_id, run_status_cd)
-        const insertQuery = 'INSERT INTO run_task (video_id, run_status_cd) VALUES (?, ?)';
-        await connection.execute(insertQuery, [videoId, 0]);
+        const insertQuery = 'INSERT INTO run_task (video_id, run_status_cd,use_random_play,use_filter) VALUES (?, ?, ?, ?)';
+        await connection.execute(insertQuery, [videoId, 0,use_random_play,use_filter]);
 
         console.log('Run task created successfully');
         res.status(200).json({ message: 'Run task created successfully' });

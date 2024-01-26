@@ -186,8 +186,8 @@ app.get('/api/search-title', async (req, res) => {
             );
             responseDataArray.push(
                 {
-                    use_random_play: getIdResults[0].use_random_play,
-                    // use_filter: getIdResults[0].use_filter,
+                    // use_random_play: getIdResults[0].use_random_play,
+                    use_filter: getIdResults[0].use_filter,
                     // title : results[0].title,
                     // keword : results[0].keword
                 }

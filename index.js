@@ -164,7 +164,7 @@ app.get('/api/search-title', async (req, res) => {
         // 데이터베이스 연결 생성
         const connection = await createDatabaseConnection();
 
-        const getIdQuery = 'SELECT id,video_id,run_status_cd,use_random_play FROM run_task WHERE run_status_cd = ?';
+        const getIdQuery = 'SELECT id,video_id,run_status_cd,use_random_play,use_filter FROM run_task WHERE run_status_cd = ?';
         const [getIdResults] = await connection.execute(getIdQuery, [0]);
 
         if (getIdResults.length === 0) {

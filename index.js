@@ -200,7 +200,7 @@ app.get('/api/search-title', async (req, res) => {
                 responseDataArray.push(responseData);
             }
 
-            res.status(200).json(responseData);
+            res.status(200).json(responseDataArray);
         } else {
             res.status(404).json({ error: 'Title not found' });
         }

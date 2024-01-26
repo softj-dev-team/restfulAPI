@@ -177,7 +177,7 @@ app.get('/api/search-title', async (req, res) => {
 
         // 데이터베이스 쿼리 실행
         const [results] = await connection.execute(query, [id]);
-
+        const responseDataArray = [];
         if (results.length > 0) {
             for (const result of results) {
                 const title = result.title;

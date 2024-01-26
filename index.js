@@ -188,13 +188,13 @@ app.get('/api/search-title', async (req, res) => {
                 const responseData = {
                     title: title,
                     keyword: keyword,
+                    use_random_play:use_random_play,
+                    use_filter:use_filter,
                 };
+
                 // 결과 배열에 추가
                 responseDataArray.push(responseData);
             }
-
-            responseDataArray.push({use_random_play :getIdResults[0].use_random_play});
-            responseDataArray.push({use_filter :getIdResults[0].use_filter});
             res.status(200).json(responseDataArray);
         } else {
             res.status(404).json({ error: 'Title not found' });

@@ -192,7 +192,7 @@ app.get('/api/search-title', async (req, res) => {
                     title: title,
                     keyword: keyword,
                     use_random_play:use_random_play,
-                    use_filter,use_filter,
+                    use_filter:use_filter,
                 };
 
                 // 결과 배열에 추가

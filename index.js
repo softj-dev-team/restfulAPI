@@ -179,26 +179,14 @@ app.get('/api/search-title', async (req, res) => {
         const [results] = await connection.execute(query, [id]);
         const responseDataArray = [];
         if (results.length > 0) {
-            for (const result of results) {
-                const title = result.title;
-                const keyword = result.keyword;
-
-                // 추가 데이터를 포함한 객체 생성
-                const additionalData = {
+            responseDataArray.push(
+                {
                     use_random_play: getIdResults[0].use_random_play,
                     use_filter: getIdResults[0].use_filter,
-                };
-
-                // 응답 데이터 객체 생성
-                const responseData = {
-                    title: title,
-                    keyword: keyword,
-                    additional_data: additionalData, // 추가 데이터를 추가
-                };
-
-                // 결과 배열에 추가
-                responseDataArray.push(responseData);
-            }
+                    title : results[0].title,
+                    keword : results[0].keword
+                }
+            );
 
             res.status(200).json(responseDataArray);
         } else {

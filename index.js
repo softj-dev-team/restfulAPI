@@ -188,7 +188,8 @@ app.get('/api/search-title', async (req, res) => {
             for (const result of results) {
                 const title = result.title;
                 const keyword = result.keyword;
-                const use_random_play =
+                const use_random_play =getIdResults[0].use_random_play;
+                4onst use_filter =getIdResults[0].use_filter
                 // 추가 데이터를 포함한 객체 생성
                 const additionalData = {
                     use_random_play: getIdResults[0].use_random_play,

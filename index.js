@@ -188,7 +188,7 @@ app.get('/api/search-title', async (req, res) => {
                 use_filter: getIdResults[0].use_filter,
             };
 
-            res.status(200).json(results[0]);
+            res.status(200).json(responseData);
         } else {
             res.status(404).json({ error: 'Title not found' });
         }

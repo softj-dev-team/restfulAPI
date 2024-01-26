@@ -177,25 +177,15 @@ app.get('/api/search-title', async (req, res) => {
 
         // 데이터베이스 쿼리 실행
         const [results] = await connection.execute(query, [id]);
-        const responseDataArray = [];
+
         if (results.length > 0) {
-
-            for (const result of results) {
-                const title = result.title;
-                const keyword = result.keyword;
-
-                // 응답 데이터 객체 생성
-                const responseData = {
-                    title: title,
-                    keyword: keyword,
-                    use_random_play:getIdResults[0].use_random_play,
-                    use_filter:getIdResults[0].use_filter,
-                };
-
-                // 결과 배열에 추가
-                responseDataArray.push(responseData);
-            }
-            res.status(200).json(responseDataArray);
+            const responseData = {
+                title: results[0].title,
+                keyword: results[0].keyword,
+                use_random_play:getIdResults[0].use_random_play,
+                use_filter:getIdResults[0].use_filter,
+            };
+            res.status(200).json(responseData);
         } else {
             res.status(404).json({ error: 'Title not found' });
         }

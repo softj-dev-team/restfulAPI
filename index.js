@@ -391,6 +391,45 @@ app.post('/api/user-register', async (req, res) => {
         res.status(400).json({ message: error.message || '회원가입에 실패하였습니다.' });
     }
 });
+// 비밀번호 변경
+app.post('/api/change-password', async (req, res) => {
+    try {
+        const { email, currentPassword, newPassword } = req.body;
+
+        // MySQL 연결 생성
+        const connection = await createDatabaseConnection();
+
+        // 사용자 이메일로 데이터베이스에서 사용자 정보를 검색
+        const [userRows] = await connection.execute('SELECT * FROM user WHERE email = ?', [email]);
+
+        if (userRows.length === 0) {
+            throw new Error('사용자를 찾을 수 없습니다.');
+        }
+
+        const user = userRows[0];
+
+        // 현재 비밀번호 확인
+        const isCurrentPasswordMatch = await bcrypt.compare(currentPassword, user.password);
+
+        if (!isCurrentPasswordMatch) {
+            throw new Error('현재 비밀번호가 일치하지 않습니다.');
+        }
+
+        // 새로운 비밀번호 해싱
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+        // 비밀번호 업데이트
+        await connection.execute('UPDATE user SET password = ? WHERE email = ?', [hashedNewPassword, email]);
+
+        // 연결 종료
+        await connection.end();
+
+        res.status(200).json({ message: '비밀번호 변경이 성공하였습니다.' });
+    } catch (error) {
+        console.error('오류:', error);
+        res.status(401).json({ error: error.message || '비밀번호 변경에 실패하였습니다.' });
+    }
+});
 // POST 요청 핸들러 - 로그인 API
 app.post('/api/login', async (req, res) => {
     try {

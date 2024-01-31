@@ -234,7 +234,7 @@ app.get('/api/google-account', async (req, res) => {
         const [results] = await connection.execute(query, ['N']);
         const id = results[0].id;
         if (results.length > 0) {
-            results[0]
+
             const updateOneQuery = 'UPDATE google_account SET use_status = ? WHERE id = ?';
             await connection.execute(updateOneQuery, ['Y',id]);
             console.log('Title search successful');

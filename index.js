@@ -235,7 +235,7 @@ app.get('/api/google-account', async (req, res) => {
 
         if (results.length <= 0) {
             const updateOneQuery = 'UPDATE google_account SET use_status = ? WHERE 1 = ?';
-            await connection.execute(updateOneQuery, ['N'],1);
+            await connection.execute(updateOneQuery, ['N',1]);
             // res.status(404).json({ error: 'Title not found' });
         } else {
             const id = results[0].id;

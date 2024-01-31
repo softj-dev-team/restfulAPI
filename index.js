@@ -223,6 +223,34 @@ app.get('/api/search-title-for-admin', async (req, res) => {
         res.status(500).json({ error: 'Error searching title' });
     }
 });
+app.get('/api/google-account', async (req, res) => {
+    try {
+        // 데이터베이스 연결 생성
+        const connection = await createDatabaseConnection();
+
+        const query = 'SELECT email, passwd FROM google_account WHERE use_status = ?';
+
+        // 데이터베이스 쿼리 실행
+        const [results] = await connection.execute(query, ['N']);
+
+        if (results.length > 0) {
+            //results[0]
+            const updateOneQuery = 'UPDATE google_account SET use_status_cd = ? WHERE id = ?';
+            await connection.execute(updateOneQuery, ['Y',results[0].id]);
+            console.log('Title search successful');
+            res.status(200).json(results[0]);
+
+        } else {
+            res.status(404).json({ error: 'Title not found' });
+        }
+
+        // 연결 종료
+        await connection.end();
+    } catch (error) {
+        console.error('Error searching title:', error);
+        res.status(500).json({ error: 'Error searching title' });
+    }
+});
 //video title 사용 여부 갱신
 app.post('/api/use-status-change', async (req, res) => {
     const id = req.body.id;

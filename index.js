@@ -232,11 +232,11 @@ app.get('/api/google-account', async (req, res) => {
 
         // 데이터베이스 쿼리 실행
         const [results] = await connection.execute(query, ['N']);
-
+        const id = results[0].id;
         if (results.length > 0) {
-            //results[0]
+            results[0]
             const updateOneQuery = 'UPDATE google_account SET use_status = ? WHERE id = ?';
-            await connection.execute(updateOneQuery, ['Y',results[0].id]);
+            await connection.execute(updateOneQuery, ['Y',id]);
             console.log('Title search successful');
             res.status(200).json(results[0]);
 

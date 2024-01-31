@@ -233,15 +233,17 @@ app.get('/api/google-account', async (req, res) => {
         // 데이터베이스 쿼리 실행
         const [results] = await connection.execute(query, ['N']);
 
-        if (results.length > 0) {
+        if (results.length <= 0) {
+            const updateOneQuery = 'UPDATE google_account SET use_status = ? WHERE 1 = ?';
+            await connection.execute(updateOneQuery, ['N'],1);
+            // res.status(404).json({ error: 'Title not found' });
+        } else {
             const id = results[0].id;
             const updateOneQuery = 'UPDATE google_account SET use_status = ? WHERE id = ?';
             await connection.execute(updateOneQuery, ['Y',id]);
             console.log('Title search successful');
             res.status(200).json(results[0]);
 
-        } else {
-            res.status(404).json({ error: 'Title not found' });
         }
 
         // 연결 종료

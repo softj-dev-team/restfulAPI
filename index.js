@@ -206,7 +206,7 @@ app.get('/api/search-title-for-admin', async (req, res) => {
         const query = 'SELECT title, keyword FROM video WHERE use_status_cd = ? and user_id= ?';
 
         // 데이터베이스 쿼리 실행
-        const [results] = await connection.execute(query, [1,'majorsafe4@gmail.com']);
+        const [results] = await connection.execute(query, [1,'dev@softj.net']);
 
         if (results.length > 0) {
 

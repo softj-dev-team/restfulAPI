@@ -238,11 +238,12 @@ app.get('/api/google-account', async (req, res) => {
             const updateAllQuery = 'UPDATE google_account SET use_status = ?';
             await connection.execute(updateAllQuery, ['N']);
         } else {
-          const id = results[0].id;
-          const updateOneQuery = 'UPDATE google_account SET use_status = ? WHERE id = ?';
-          await connection.execute(updateOneQuery, ['Y', id]);
-          console.log('Title search successful');
-      }
+            const id = results[0].id;
+            const updateOneQuery = 'UPDATE google_account SET use_status = ? WHERE id = ?';
+            await connection.execute(updateOneQuery, ['Y', id]);
+            console.log('Title search successful');
+            res.status(200).json(results[0]);
+        }
         // 연결 종료
         await connection.end();
     } catch (error) {

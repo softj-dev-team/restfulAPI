@@ -245,14 +245,14 @@ app.get('/api/google-account', async (req, res) => {
             const id = results[0].id;
             const updateOneQuery = 'UPDATE google_account SET use_status = ? WHERE id = ?';
             await connection.execute(updateOneQuery, ['Y', id]);
-            console.log('Title search successful');
+            console.log('google account get successful');
             res.status(200).json(results[0]);
         }
         // 연결 종료
         await connection.end();
     } catch (error) {
-        console.error('Error searching title:', error);
-        res.status(500).json({ error: 'Error searching title' });
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Error' });
     }
 });
 //video title 사용 여부 갱신

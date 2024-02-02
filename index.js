@@ -261,7 +261,7 @@ app.post('/api/google-account_result', async (req, res) => {
         // 데이터베이스 연결 생성
         const connection = await createDatabaseConnection();
 
-        const query = 'SELECT id, email, password,level FROM google_account WHERE use_status = ?,account_active=?';
+        const query = 'SELECT id, email, password,level FROM google_account WHERE use_status = ? and account_active=?';
 
         // 데이터베이스 쿼리 실행
         const [results] = await connection.execute(query, ['N','Y']);

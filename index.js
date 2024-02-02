@@ -255,6 +255,39 @@ app.get('/api/google-account', async (req, res) => {
         res.status(500).json({ error: 'Error' });
     }
 });
+app.post('/api/google-account_result', async (req, res) => {
+    const id = req.body.id;
+    try {
+        // 데이터베이스 연결 생성
+        const connection = await createDatabaseConnection();
+
+        const query = 'SELECT id, email, password,level FROM google_account WHERE use_status = ?,account_active=?';
+
+        // 데이터베이스 쿼리 실행
+        const [results] = await connection.execute(query, ['N','Y']);
+
+      if (results.length === 0) {
+            // 'N'인 row가 없으면 모든 row의 use_status를 'N'으로 변경
+            const updateAllQuery = 'UPDATE google_account SET use_status = ?';
+            await connection.execute(updateAllQuery, ['N']);
+            const query = 'SELECT id, email, password,level FROM google_account';
+            // 데이터베이스 쿼리 실행
+            const [results] = await connection.execute(query);
+             res.status(200).json(results[0]);
+        } else {
+            const id = results[0].id;
+            const updateOneQuery = 'UPDATE google_account SET use_status = ? WHERE id = ?';
+            await connection.execute(updateOneQuery, ['Y', id]);
+            console.log('google account get successful');
+            res.status(200).json(results[0]);
+        }
+        // 연결 종료
+        await connection.end();
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Error' });
+    }
+});
 //video title 사용 여부 갱신
 app.post('/api/use-status-change', async (req, res) => {
     const id = req.body.id;

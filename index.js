@@ -228,10 +228,10 @@ app.get('/api/google-account', async (req, res) => {
         // 데이터베이스 연결 생성
         const connection = await createDatabaseConnection();
 
-        const query = 'SELECT id, email, password,level FROM google_account WHERE use_status = ?';
+        const query = 'SELECT id, email, password,level FROM google_account WHERE use_status = ?,account_active=?';
 
         // 데이터베이스 쿼리 실행
-        const [results] = await connection.execute(query, ['N']);
+        const [results] = await connection.execute(query, ['N','Y']);
 
       if (results.length === 0) {
             // 'N'인 row가 없으면 모든 row의 use_status를 'N'으로 변경

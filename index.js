@@ -296,9 +296,13 @@ app.post('/api/use-status-change', async (req, res) => {
         // 데이터베이스 연결 생성
         const connection = await createDatabaseConnection();
 
+         //
+        const query = 'select user_id from video WHERE id = ?';
+        const [userresult] = await connection.execute(query, [id]);
+        const user_id = userresult[0].user_id;
         // 이미 use_status_cd가 1이었던 row를 0으로 업데이트
-        const updateZeroQuery = 'UPDATE video SET use_status_cd = 0 WHERE use_status_cd = 1';
-        await connection.execute(updateZeroQuery);
+        const updateZeroQuery = 'UPDATE video SET use_status_cd = 0 WHERE use_status_cd = ? and user_id = ?';
+        await connection.execute(updateZeroQuery,[1,user_id]);
 
         // 입력받은 id와 일치하는 row의 use_status_cd를 1로 업데이트
         const updateOneQuery = 'UPDATE video SET use_status_cd = 1 WHERE id = ?';

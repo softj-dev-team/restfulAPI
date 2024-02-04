@@ -231,15 +231,15 @@ app.get('/api/google-account', async (req, res) => {
         const query = 'SELECT id, email, password,level FROM google_account WHERE use_status = ? and account_active=? and login_status = ?';
 
         // 데이터베이스 쿼리 실행
-        const [results] = await connection.execute(query, ['N','Y','Y']);
+        const [results] = await connection.execute(query, ['N','Y','N']);
 
       if (results.length === 0) {
             // 'N'인 row가 없으면 모든 row의 use_status를 'N'으로 변경
             const updateAllQuery = 'UPDATE google_account SET use_status = ?';
             await connection.execute(updateAllQuery, ['N']);
-            const query = 'SELECT id, email, password,level FROM google_account where account_active=?';
+            const query = 'SELECT id, email, password,level FROM google_account where account_active=? and login_status = ?';
             // 데이터베이스 쿼리 실행
-            const [results] = await connection.execute(query,['Y']);
+            const [results] = await connection.execute(query,['Y','N']);
              res.status(200).json(results[0]);
         } else {
             const id = results[0].id;

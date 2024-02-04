@@ -264,10 +264,10 @@ app.post('/api/google-account-result', async (req, res) => {
         const connection = await createDatabaseConnection();
         let query ='select 1';
         if(login_status==='Y'){
-            query = 'update google_account set WHERE login_status = ? where id=?';
+            query = 'update google_account set login_status = ? where id=?';
         }
         if(login_status==='N'){
-            query = 'update google_account set WHERE account_active = ? where id=?';
+            query = 'update google_account set account_active = ? where id=?';
         }
         await connection.execute(query, [login_status, id]);
         await connection.end();

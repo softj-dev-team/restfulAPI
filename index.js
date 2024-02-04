@@ -262,12 +262,12 @@ app.post('/api/google-account-result', async (req, res) => {
 
         // 데이터베이스 연결 생성
         const connection = await createDatabaseConnection();
-        const query ='select 1';
+        let query ='select 1';
         if(login_status==='Y'){
-            const query = 'update google_account set WHERE login_status = ? where id=?';
+            query = 'update google_account set WHERE login_status = ? where id=?';
         }
         if(login_status==='N'){
-            const query = 'update google_account set WHERE account_active = ? where id=?';
+            query = 'update google_account set WHERE account_active = ? where id=?';
         }
         await connection.execute(query, [login_status, id]);
         await connection.end();

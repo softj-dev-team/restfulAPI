@@ -271,7 +271,7 @@ app.post('/api/google-account-result', async (req, res) => {
         }
         await connection.execute(query, [login_status, id]);
         await connection.end();
-        console.info(query);
+        console.error(query);
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ error: 'Error' });

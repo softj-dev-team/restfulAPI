@@ -269,9 +269,9 @@ app.post('/api/google-account-result', async (req, res) => {
         if(login_status==='N'){
             query = 'update google_account set account_active = ? where id=?';
         }
-        await connection.execute(query, [login_status, id]);
+        await connection.execute(query, [id]);
         await connection.end();
-        console.error(query);
+
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ error: 'Error' });

@@ -255,7 +255,7 @@ app.get('/api/google-account', async (req, res) => {
         res.status(500).json({ error: 'Error' });
     }
 });
-app.post('/api/google-account_result', async (req, res) => {
+app.post('/api/google-account-result', async (req, res) => {
     const id = req.body.id;
     const login_status = req.body.login_status;
     try {

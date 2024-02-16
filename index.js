@@ -228,18 +228,18 @@ app.get('/api/google-account', async (req, res) => {
         // 데이터베이스 연결 생성
         const connection = await createDatabaseConnection();
 
-        const query = 'SELECT id, email, password,level FROM google_account WHERE use_status = ? and account_active=?';
+        const query = 'SELECT id, email, password,level FROM google_account WHERE use_status = ? and account_active=? and login_status = ?';
 
         // 데이터베이스 쿼리 실행
-        const [results] = await connection.execute(query, ['N','Y']);
+        const [results] = await connection.execute(query, ['N','Y','N']);
 
       if (results.length === 0) {
             // 'N'인 row가 없으면 모든 row의 use_status를 'N'으로 변경
             const updateAllQuery = 'UPDATE google_account SET use_status = ?';
             await connection.execute(updateAllQuery, ['N']);
-            const query = 'SELECT id, email, password,level FROM google_account';
+            const query = 'SELECT id, email, password,level FROM google_account where account_active=? and login_status = ?';
             // 데이터베이스 쿼리 실행
-            const [results] = await connection.execute(query);
+            const [results] = await connection.execute(query,['Y','N']);
              res.status(200).json(results[0]);
         } else {
             const id = results[0].id;
@@ -255,34 +255,23 @@ app.get('/api/google-account', async (req, res) => {
         res.status(500).json({ error: 'Error' });
     }
 });
-app.post('/api/google-account_result', async (req, res) => {
+app.post('/api/google-account-result', async (req, res) => {
     const id = req.body.id;
+    const login_status = req.body.login_status;
     try {
+
         // 데이터베이스 연결 생성
         const connection = await createDatabaseConnection();
-
-        const query = 'SELECT id, email, password,level FROM google_account WHERE use_status = ? and account_active=?';
-
-        // 데이터베이스 쿼리 실행
-        const [results] = await connection.execute(query, ['N','Y']);
-
-      if (results.length === 0) {
-            // 'N'인 row가 없으면 모든 row의 use_status를 'N'으로 변경
-            const updateAllQuery = 'UPDATE google_account SET use_status = ?';
-            await connection.execute(updateAllQuery, ['N']);
-            const query = 'SELECT id, email, password,level FROM google_account';
-            // 데이터베이스 쿼리 실행
-            const [results] = await connection.execute(query);
-             res.status(200).json(results[0]);
-        } else {
-            const id = results[0].id;
-            const updateOneQuery = 'UPDATE google_account SET use_status = ? WHERE id = ?';
-            await connection.execute(updateOneQuery, ['Y', id]);
-            console.log('google account get successful');
-            res.status(200).json(results[0]);
+        let query ='';
+        if(login_status==='Y'){
+            query = 'update google_account set login_status = ? where id=?';
         }
-        // 연결 종료
+        if(login_status==='N'){
+            query = 'update google_account set account_active = ? where id=?';
+        }
+        await connection.execute(query, [login_status, id]);
         await connection.end();
+        res.status(200).json({ error: 'success' });
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ error: 'Error' });

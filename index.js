@@ -535,6 +535,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));
 });
+app.get('/main', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/main/index.html'));
+});
 // Include the webhook router
 const webhookRouter = require('./webhook/webhook.js');
 // Use the webhook router for the '/webhook' endpoint
